@@ -82,9 +82,9 @@ namespace LevelEditor
 
         private void SetTileSet(ImageSource tiles)
         {
-            for (int i = 0; i < tiles.Height / 16; i++)
+            for (int i = 0; i < tiles.Width / 16; i++)
             {
-                for (int j = 0; j < tiles.Width / 16; j++)
+                for (int j = 0; j < tiles.Height / 16; j++)
                 {
                     Image tileImg = new Image();
                     CroppedBitmap cb = new CroppedBitmap((BitmapSource) tiles, new Int32Rect(j * 16, i * 16, 16, 16));

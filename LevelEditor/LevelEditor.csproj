@@ -125,5 +125,8 @@
   <ItemGroup>
     <Folder Include="Json\" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="resources\tilesedited.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
