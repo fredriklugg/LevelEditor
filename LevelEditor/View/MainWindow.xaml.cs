@@ -33,6 +33,7 @@ namespace LevelEditor
         public int GridRows { get; set; }
         public int GridColumns { get; set; }
         public object SelectedTile { get; set; }
+        public int SelectedTileIndex { get; set; }
         public bool ForegroundSelected { get; set; }
         public bool BackgroundSelected { get; set; }
         public ImageSource TileSet { get; set; }
@@ -43,6 +44,8 @@ namespace LevelEditor
             InitializeComponent();
             InitGrid(10, 10);
             BackgroundSelected = true;
+            GridRows = 10;
+            GridColumns = 10;
         }
 
         private void InitGrid(int columns, int rows)
@@ -58,8 +61,6 @@ namespace LevelEditor
             grid.Columns = columns;
             grid.Rows = rows;
 
-            //ImageSource imageSource = new BitmapImage(new Uri(""));
-
             for (int row = 0; row < rows; row++)
             {
                 for (int column = 0; column < columns; column++)
@@ -67,11 +68,9 @@ namespace LevelEditor
                     var button = new Button
                     {
                         Name = "button" + column + row,
-                        //Background = new ImageBrush(imageSource)
                         Background = new SolidColorBrush(Colors.White)
                     };
 
-                    //button.MouseDown += Draw;
                     button.Click += new RoutedEventHandler(Draw);
 
                     grid.Children.Add(button);
@@ -83,11 +82,6 @@ namespace LevelEditor
 
         private void SetTileSet(ImageSource tiles)
         {
-            var grid = new UniformGrid();
-            grid.Height = 400;
-            grid.Width = 400;
-
-            //ImageSource tiles = new BitmapImage(new Uri(@"C:\Users\Fredrik\Desktop\Skole\3.År\Semester 1\Tools Prog\Kode\LevelEditor\LevelEditor\overworld_tileset_grass.png"));
 
             for (int i = 0; i < tiles.Height / 16; i++)
             {
@@ -137,6 +131,9 @@ namespace LevelEditor
         }
         private void setGridSize(object sender, RoutedEventArgs e)
         {
+            GridRows = Convert.ToInt32(RowsTxtBox.Text);
+            GridColumns = Convert.ToInt32(ColumnTxtBox.Text);
+
             InitGrid(Convert.ToInt32(ColumnTxtBox.Text), Convert.ToInt32(RowsTxtBox.Text));
             //Console.WriteLine(ColumnTxtBox.Text + " " + RowsTxtBox.Text);
         }
@@ -144,7 +141,8 @@ namespace LevelEditor
         private void TileBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             SelectedTile = TileBox.SelectedItem;
-            Console.WriteLine("CHANGED SELECTED TILE " + SelectedTile);
+            SelectedTileIndex = TileBox.SelectedIndex;
+            Console.WriteLine("CHANGED SELECTED TILE " + SelectedTileIndex);
         }
 
         private void Foreground_Click(object sender, RoutedEventArgs e)
@@ -189,9 +187,10 @@ namespace LevelEditor
 
         private void SaveMap_Click(object sender, RoutedEventArgs e)
         {
-            var jsontest = new JsonSerializer();
-
-            jsontest.SerializeMap();
+            MapData map = new MapData(GridRows, GridColumns, new []{10,10}, TileSet);
+            
+            var jsontest = new JsonHandler();
+            jsontest.SerializeMap(map);
         }
     }
 }

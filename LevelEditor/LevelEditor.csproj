@@ -75,7 +75,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="JsonSerializer.cs" />
+    <Compile Include="JsonHandler.cs" />
     <Compile Include="MapData.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
@@ -120,7 +120,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="overworld_tileset_grass.png" />
+    <Resource Include="resources\overworld_tileset_grass.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Json\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
