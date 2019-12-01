@@ -7,14 +7,14 @@ using System.Windows.Navigation;
 
 namespace LevelEditor
 {
-    public class MapData
+    public class Map
     {
         public int GridRows { get; set; }
         public int GridColumns { get; set; }
         public int[] Tiles { get; set; }
         public ImageSource TileSet { get; set; }
 
-        public MapData(int gr, int gc, int[] tiles, ImageSource tileset)
+        public Map(int gr, int gc, int[] tiles, ImageSource tileset)
         {
             GridRows = gr;
             GridColumns = gc;

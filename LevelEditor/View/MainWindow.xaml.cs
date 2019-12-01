@@ -42,10 +42,10 @@ namespace LevelEditor
         public MainWindow()
         {
             InitializeComponent();
-            InitGrid(10, 10);
-            BackgroundSelected = true;
             GridRows = 10;
             GridColumns = 10;
+            InitGrid(GridColumns, GridRows);
+            BackgroundSelected = true;
         }
 
         private void InitGrid(int columns, int rows)
@@ -82,7 +82,6 @@ namespace LevelEditor
 
         private void SetTileSet(ImageSource tiles)
         {
-
             for (int i = 0; i < tiles.Height / 16; i++)
             {
                 for (int j = 0; j < tiles.Width / 16; j++)
@@ -153,7 +152,6 @@ namespace LevelEditor
                 BackgroundSelected = false;
                 Console.WriteLine("Foreground selected");
             }
-            else return;
         }
 
         private void Background_Click(object sender, RoutedEventArgs e)
@@ -163,9 +161,7 @@ namespace LevelEditor
                 BackgroundSelected = true;
                 ForegroundSelected = false;
                 Console.WriteLine("Background selected");
-
             }
-            else return;
         }
 
         private void LoadTileset(object sender, RoutedEventArgs e)
@@ -187,10 +183,16 @@ namespace LevelEditor
 
         private void SaveMap_Click(object sender, RoutedEventArgs e)
         {
-            MapData map = new MapData(GridRows, GridColumns, new []{10,10}, TileSet);
+            Map map = new Map(GridRows, GridColumns, new []{10,10}, TileSet);
             
-            var jsontest = new JsonHandler();
-            jsontest.SerializeMap(map);
+            var json = new JsonHandler();
+            json.SerializeMap(map);
+        }
+
+        private void LoadMap_Click(object sender, RoutedEventArgs e)
+        {
+            var json = new JsonHandler();
+            json.DeserializeMap();
         }
     }
 }

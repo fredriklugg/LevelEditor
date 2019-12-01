@@ -9,7 +9,7 @@ namespace LevelEditor
 {
     public class JsonHandler
     {
-        public void SerializeMap(MapData map)
+        public void SerializeMap(Map map)
         {
             string path;
 
@@ -31,9 +31,29 @@ namespace LevelEditor
                 {
                     serializer.Serialize(writer, map);
                 }
+            }
+        }
 
-                string output = JsonConvert.SerializeObject(map);
-                Console.WriteLine(output);
+        public void DeserializeMap()
+        {
+            OpenFileDialog op = new OpenFileDialog
+            {
+                Title = "Select a JSON map file",
+                Filter = "Only supports JSON|*.json"
+            };
+            if (op.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                using (StreamReader sr = new StreamReader(op.FileName))
+                {
+                    string line;
+
+                    line = sr.ReadLine();
+
+                    Map DeserializedMap = JsonConvert.DeserializeObject<Map>(line);
+
+                    Console.WriteLine(DeserializedMap);
+                    //return DeserializedMap;
+                }
             }
         }
     }

@@ -9,7 +9,7 @@
         Title="MainWindow" Height="500" Width="800">
     <Grid Name = "MainGrid">
         <UniformGrid Name="GridMap" HorizontalAlignment="Left" Margin="365,35,0,0" Width="400" Background="Gray" Height="400" VerticalAlignment="Top"/>
-        <Button Content="Load Map" HorizontalAlignment="Left" Margin="25,384,0,0" VerticalAlignment="Top" Width="145" Height="50"/>
+        <Button Content="Load Map" HorizontalAlignment="Left" Margin="25,384,0,0" VerticalAlignment="Top" Width="145" Height="50" Click="LoadMap_Click"/>
         <Button Content="Save Map" HorizontalAlignment="Left" Margin="195,384,0,0" VerticalAlignment="Top" Width="145" Height="50" Click="SaveMap_Click"/>
         <TextBox Name="ColumnTxtBox" HorizontalAlignment="Left" Height="20" Margin="285,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="30"/>
         <TextBox Name="RowsTxtBox" HorizontalAlignment="Left" Height="20" Margin="319,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="30"/>
