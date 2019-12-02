@@ -22,7 +22,6 @@ namespace LevelEditor
             if (sfd.ShowDialog() == DialogResult.OK)
             {
                 path = Path.GetFullPath(sfd.FileName);
-
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.NullValueHandling = NullValueHandling.Ignore;
 

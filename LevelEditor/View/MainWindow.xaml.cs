@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -14,8 +15,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using GalaSoft.MvvmLight.CommandWpf;
-using LevelEditor.ViewModel;
 using Button = System.Windows.Controls.Button;
 using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using Image = System.Windows.Controls.Image;
@@ -38,108 +37,122 @@ namespace LevelEditor
         public bool BackgroundSelected { get; set; }
         public ImageSource TileSet { get; set; }
         public string TileSetSource { get; set; }
+        public List<Tile> TileList = new List<Tile>();
 
         public MainWindow()
         {
+            ImageSource standardTiles = new BitmapImage(new Uri(@"C:\Users\Fredrik\Desktop\Skole\3.År\Semester 1\Tools Prog\Kode\LevelEditor\LevelEditor\resources\tilesedited.png"));
+
             InitializeComponent();
+            SetTileSet(standardTiles);
+            SelectedTile = TileBox.Items.GetItemAt(32);
             GridRows = 10;
             GridColumns = 10;
-            InitGrid(GridColumns, GridRows);
+            InitGrid(GridColumns, GridRows, GridMap);
             BackgroundSelected = true;
         }
 
-        private void InitGrid(int columns, int rows)
+        private void ResetGrid(int rows, int columns, Grid grid)
         {
-            var grid = new UniformGrid();
+            grid.Children.Clear();
+            grid.ColumnDefinitions.Clear();
+            grid.RowDefinitions.Clear();
+            for (int row = 0; row < rows; row++) { grid.RowDefinitions.Add(new RowDefinition());}
+            for (int column = 0; column < columns; column++) { grid.ColumnDefinitions.Add(new ColumnDefinition());}
+        }
 
-            grid.Height = 400;
-            grid.Width = 400;
-            grid.HorizontalAlignment = HorizontalAlignment.Left;
-            grid.VerticalAlignment = VerticalAlignment.Top;
-            grid.Margin = new Thickness(365, 35, 0, 0);
-
-            grid.Columns = columns;
-            grid.Rows = rows;
-
+        private void InitGrid(int columns, int rows, Grid grid)
+        {
+            ResetGrid(rows, columns, grid);
             for (int row = 0; row < rows; row++)
             {
                 for (int column = 0; column < columns; column++)
                 {
-                    var button = new Button
+                    Image image = new Image
                     {
-                        Name = "button" + column + row,
-                        Background = new SolidColorBrush(Colors.White)
+                        Name = "Cell" + column + row,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Stretch,
+                        Stretch = Stretch.Fill,
+                        Source = SelectedTile as BitmapSource
+                        
                     };
+                    Tile tile = new Tile(rows, column, image);
 
-                    button.Click += new RoutedEventHandler(Draw);
+                    Border border = new Border();
 
-                    grid.Children.Add(button);
+                    image.AddHandler(Image.MouseLeftButtonDownEvent, new RoutedEventHandler(Draw), true);
+                    image.AddHandler(Mouse.PreviewMouseMoveEvent, new RoutedEventHandler(Draw), true);
+
+                    Grid.SetColumn(image, column);
+                    Grid.SetRow(image, row);
+                    
+                    grid.Children.Add(image);
                 }
             }
-
-            MainGrid.Children.Add(grid);
         }
 
         private void SetTileSet(ImageSource tiles)
         {
+            ResetGrid((int)tiles.Height / 16, (int)tiles.Width / 16, TilesetGrid);
+
             for (int i = 0; i < tiles.Width / 16; i++)
             {
                 for (int j = 0; j < tiles.Height / 16; j++)
                 {
-                    Image tileImg = new Image();
-                    CroppedBitmap cb = new CroppedBitmap((BitmapSource) tiles, new Int32Rect(j * 16, i * 16, 16, 16));
-                    tileImg.Source = cb;
+                    CroppedBitmap cb = new CroppedBitmap((BitmapSource) tiles, new Int32Rect(i * 16, j * 16, 16, 16));
+                    Image image = new Image();
+                    image.Source = cb;
 
-                    TileBox.Items.Add(tileImg);
+                    image.Height = cb.Height * 2;
+                    image.Width = cb.Width * 2;
+
+                    TileBox.Items.Add(cb);
                     TileBox.Items.Refresh();
                 }
             }
-            Console.WriteLine("Added tileset");
         }
 
         private void Draw(object sender, RoutedEventArgs e)
         {
-            Button button = sender as Button;
+            Image image = sender as Image;
+
+            if (Mouse.LeftButton == MouseButtonState.Released)
+            {
+                return;
+            }
 
             if (BackgroundSelected)
             {
                 if (SelectedTile != null)
                 {
-                    button.Background = new BitmapCacheBrush((Visual)SelectedTile);
+                    image.Source = (BitmapSource) SelectedTile;
                 }
-                else
-                {
-                    button.Background = new SolidColorBrush(Colors.Black);
-                }
+
             }
-            
-            if(ForegroundSelected)
+            else if(ForegroundSelected)
 
             {
                 if (SelectedTile != null)
                 {
-                    button.Foreground = new BitmapCacheBrush((Visual)SelectedTile);
-                }
-                else
-                {
-                    button.Foreground = new SolidColorBrush(Colors.Black);
+                    image.Source = (BitmapSource) SelectedTile;
                 }
             }
-
-            Console.WriteLine("Button Clicked " + button.Name);
+            Console.WriteLine("Button Clicked " + image.Name);
         }
+
         private void setGridSize(object sender, RoutedEventArgs e)
         {
             GridRows = Convert.ToInt32(RowsTxtBox.Text);
             GridColumns = Convert.ToInt32(ColumnTxtBox.Text);
 
-            InitGrid(Convert.ToInt32(ColumnTxtBox.Text), Convert.ToInt32(RowsTxtBox.Text));
+            InitGrid(Convert.ToInt32(ColumnTxtBox.Text), Convert.ToInt32(RowsTxtBox.Text), GridMap);
             //Console.WriteLine(ColumnTxtBox.Text + " " + RowsTxtBox.Text);
         }
 
         private void TileBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            SelectedTile = TileBox.SelectedItem;
+            SelectedTile = TileBox.SelectedItem as BitmapSource;
             SelectedTileIndex = TileBox.SelectedIndex;
             Console.WriteLine("CHANGED SELECTED TILE " + SelectedTileIndex);
         }
@@ -183,16 +196,28 @@ namespace LevelEditor
 
         private void SaveMap_Click(object sender, RoutedEventArgs e)
         {
-            Map map = new Map(GridRows, GridColumns, new []{10,10}, TileSet);
-            
+            addTileToList(GridMap);
+            Map map = new Map(GridRows, GridColumns, TileList, TileSet);
             var json = new JsonHandler();
             json.SerializeMap(map);
+            TileList.Clear();
+
         }
 
         private void LoadMap_Click(object sender, RoutedEventArgs e)
         {
-            var json = new JsonHandler();
-            json.DeserializeMap();
+            //var json = new JsonHandler();
+            //json.DeserializeMap();
+            addTileToList(GridMap);
+        }
+
+        private void addTileToList(Grid grid)
+        {
+            foreach (var tile in grid.Children)
+            {
+                TileList.Add(tile);
+                Console.WriteLine(tile);
+            }
         }
     }
 }
