@@ -14,8 +14,6 @@
         <TextBox Name="RowsTxtBox" HorizontalAlignment="Left" Height="20" Margin="319,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="30"/>
         <Button Content="Set grid" HorizontalAlignment="Left" Margin="285,60,0,0" VerticalAlignment="Top" Width="64"  Click="setGridSize"/>
         <ListView Name="TileBox" HorizontalAlignment="Left" Height="278" Margin="25,35,0,0" VerticalAlignment="Top" Width="237" SelectionChanged="TileBox_SelectionChanged"/>
-        <Button Content="Foreground" HorizontalAlignment="Left" Margin="287,255,0,0" VerticalAlignment="Top" Width="69" Height="39" Click="Foreground_Click"/>
-        <Button Content="Background" HorizontalAlignment="Left" Margin="287,307,0,0" VerticalAlignment="Top" Width="69" Height="39" Click="Background_Click"/>
         <Button Content="Load Tileset" HorizontalAlignment="Left" Margin="25,331,0,0" VerticalAlignment="Top" Width="113"  Click="LoadTileset"/>
         <Grid Name="TilesetGrid" HorizontalAlignment="Left" Height="100" Margin="162,122,0,0" VerticalAlignment="Top" Width="100"/>
 

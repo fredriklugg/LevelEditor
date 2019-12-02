@@ -12,14 +12,14 @@ namespace LevelEditor
     {
         public int GridRows { get; set; }
         public int GridColumns { get; set; }
-        public List<object> TileList = new List<object>();
+        public List<Tile> TileList = new List<Tile>();
         public ImageSource TileSet { get; set; }
 
-        public Map(int gr, int gc, List<object> tiles, ImageSource tileset)
+        public Map(int gr, int gc, List<Tile> tiles, ImageSource tileset)
         {
             GridRows = gr;
             GridColumns = gc;
-            TileList.AddRange(tiles);
+            TileList = tiles;
             TileSet = tileset;
         }
 

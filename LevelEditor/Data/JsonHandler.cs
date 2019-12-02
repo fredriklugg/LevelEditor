@@ -33,8 +33,10 @@ namespace LevelEditor
             }
         }
 
-        public void DeserializeMap()
+        public Map DeserializeMap()
         {
+            Map DeserializedMap = null;
+
             OpenFileDialog op = new OpenFileDialog
             {
                 Title = "Select a JSON map file",
@@ -48,12 +50,13 @@ namespace LevelEditor
 
                     line = sr.ReadLine();
 
-                    Map DeserializedMap = JsonConvert.DeserializeObject<Map>(line);
+                    DeserializedMap = JsonConvert.DeserializeObject<Map>(line);
 
                     Console.WriteLine(DeserializedMap);
-                    //return DeserializedMap;
+                    
                 }
             }
+            return DeserializedMap;
         }
     }
 }

@@ -7,13 +7,16 @@ namespace LevelEditor
     {
         public int GridRowPos { get; set; }
         public int GridColumnPos { get; set; }
-        public ImageSource TileImage { get; set; }
+        public string TileImage { get; set; }
+        public int TileIndex { get; set; }
 
-        public Tile(int grp, int gcp, Image ti)
+        public Tile(int grp, int gcp, string ti, int tileIndex)
         {
             GridRowPos = grp;
             GridColumnPos = gcp;
             TileImage = ti;
+            TileIndex = tileIndex;
         }
+
     }
 }
