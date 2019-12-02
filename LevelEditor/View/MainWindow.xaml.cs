@@ -35,17 +35,19 @@ namespace LevelEditor
         public int SelectedTileIndex { get; set; }
         public ImageSource TileSet { get; set; }
         public string TileSetSource { get; set; }
+
         public List<Tile> TileList = new List<Tile>();
-        public List<object> TestList = new List<object>();
+
+        public List<int> TileSetList = new List<int>();
 
         public MainWindow()
         {
-            ImageSource standardTiles = new BitmapImage(new Uri(@"C:\Users\Fredrik\Desktop\Skole\3.År\Semester 1\Tools Prog\Kode\LevelEditor\LevelEditor\resources\tilesedited.png"));
+            ImageSource standardTiles = new BitmapImage(new Uri(@"C:\Users\Fredrik\Desktop\Skole\3.År\Semester 1\Tools Prog\Kode\LevelEditor\LevelEditor\resources\tiles-simple.png"));
 
             InitializeComponent();
             SetTileSet(standardTiles);
-            SelectedTile = TileBox.Items.GetItemAt(32);
-            SelectedTileIndex = 32;
+            SelectedTile = TileBox.Items.GetItemAt(4);
+            SelectedTileIndex = 4;
             GridRows = 10;
             GridColumns = 10;
             InitGrid(GridColumns, GridRows);
@@ -95,7 +97,7 @@ namespace LevelEditor
         private void LoadGrid(Map map)
         {
             ResetGrid(map.GridRows, map.GridColumns);
-            TileList.Clear(); //Make sure tilelist is empty
+            //TileList.Clear(); //Make sure tilelist is empty
 
             for (int row = 0; row < map.GridRows; row++)
             {
@@ -110,9 +112,8 @@ namespace LevelEditor
                         Stretch = Stretch.Fill,
                         Source = TileBox.Items.GetItemAt(Convert.ToInt32(map.TileList[indexPos].TileImage)) as BitmapSource
                     };
-
                     Tile tile = new Tile(row, column, map.TileList[indexPos].TileImage, indexPos);
-                    TileList.Add(tile);
+                    TileList[indexPos] = tile;
 
                     image.AddHandler(Image.MouseLeftButtonDownEvent, new RoutedEventHandler(Draw), true);
 
@@ -122,7 +123,6 @@ namespace LevelEditor
                     GridMap.Children.Add(image);
                 }
             }
-
         }
 
         private void SetTileSet(ImageSource tiles)
@@ -134,11 +134,10 @@ namespace LevelEditor
                     CroppedBitmap cb = new CroppedBitmap((BitmapSource) tiles, new Int32Rect(i * 16, j * 16, 16, 16));
                     Image image = new Image();
                     image.Source = cb;
-
                     image.Height = cb.Height * 2;
                     image.Width = cb.Width * 2;
 
-                    TileBox.Items.Add(cb);
+                    TileBox.Items.Add(image);
                     TileBox.Items.Refresh();
                 }
             }
@@ -148,24 +147,32 @@ namespace LevelEditor
         {
             Image image = sender as Image;
             string gridIndex = getGridIndexFromName(image.Name);
+            Console.WriteLine(gridIndex);
             image.Name = "";
 
             if (SelectedTile != null)
             {
                 image.Source = (BitmapSource) SelectedTile;
                 image.Name = "Cell" + SelectedTileIndex + "x" + gridIndex;
-                TileList[Convert.ToInt32(gridIndex)].TileImage = getImageIdFromName(image.Name);
+                if (gridIndex == getGridIndexFromName(image.Name))
+                {
+                    TileList[Convert.ToInt32(gridIndex)].TileImage = getImageIdFromName(image.Name);
+                    checkNeighbourTiles(Convert.ToInt32(getGridIndexFromName(image.Name)));
+                }
             }
             Console.WriteLine("Button Clicked " + image.Name);
-            return;
         }
 
         private void setGridSize(object sender, RoutedEventArgs e)
         {
-            GridRows = Convert.ToInt32(RowsTxtBox.Text);
-            GridColumns = Convert.ToInt32(ColumnTxtBox.Text);
+            if (GridDimentions.Text == String.Empty || Convert.ToInt32(GridDimentions.Text) > 10) 
+            {
+                return;
+            }
+            GridColumns = Convert.ToInt32(GridDimentions.Text);
+            GridRows = Convert.ToInt32(GridDimentions.Text);
 
-            InitGrid(Convert.ToInt32(ColumnTxtBox.Text), Convert.ToInt32(RowsTxtBox.Text));
+            InitGrid(Convert.ToInt32(GridDimentions.Text), Convert.ToInt32(GridDimentions.Text));
         }
 
         private void TileBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -206,26 +213,29 @@ namespace LevelEditor
             LoadGrid(map);
         }
 
-        private void AddTilesToList(Grid grid)
-        {
-            foreach (var tile in grid.Children)
-            {
-                TestList.Add(tile);
-                Console.WriteLine(tile);
-            }
-        }
-
         private string getImageIdFromName(string name)
         {
-            string sub = name.Substring(4, 2);
-            return sub.Replace("x", String.Empty);
+            string sub = name.Substring(4, 1);
+            if (name.Length > 7)
+            {
+                if (sub.Contains("x"))
+                {
+                    return sub = name.Substring(4, 2);
+                }
+            }
+
+            return sub;
         }
 
         private string getGridIndexFromName(string name)
         {
-            if (name.Length == 8)
+            if (name.Length == 7)
             {
-                return name.Substring(7,1);
+                return name.Substring(6, 1);
+            }
+            else if (name.Length == 8)
+            {
+                return name.Substring(6,2);
             }
             else if (name.Length == 9)
             {
@@ -234,5 +244,32 @@ namespace LevelEditor
 
             return name;
         }
+
+        private void checkNeighbourTiles(int tileIndex)
+        {
+            //Neighbours: L = Left, R = Right, T= Top, B = bottom 
+            int L = tileIndex - 1;
+            int R = tileIndex + 1;
+            int T = tileIndex - 10;
+            int TL = T - 1;
+            int TR = T + 1;
+            int B = tileIndex + 10;
+            int BL_ = B - 1;
+            int BR = B + 1;
+
+            if (TileList[R].TileImage == "8")
+            {
+                TileList[R].TileImage = "1";
+                Map updateMap = new Map(GridRows, GridColumns, TileList, TileSet);
+                LoadGrid(updateMap);
+            }
+        }
+    }
+
+    public class ListViewData
+    {
+        public Image image { get; set; }
+        public ImageSource imageSource { get; set; }
+
     }
 }

@@ -115,5 +115,11 @@
   <ItemGroup>
     <Resource Include="resources\tilesedited.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="resources\tilesmini.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="resources\tiles-simple.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
