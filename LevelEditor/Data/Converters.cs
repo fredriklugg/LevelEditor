@@ -1,7 +1,7 @@
 ﻿
 namespace LevelEditor.Data
 {
-    class Converters
+    public class Converters
     {
         public string getImageIdFromName(string name)
         {

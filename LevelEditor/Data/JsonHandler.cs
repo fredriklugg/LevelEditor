@@ -7,7 +7,7 @@ namespace LevelEditor
 {
     public class JsonHandler
     {
-        public void SerializeMap(Map map)
+        public bool SerializeMap(Map map)
         {
             string path;
 
@@ -27,8 +27,11 @@ namespace LevelEditor
                 using (JsonWriter writer = new JsonTextWriter(sw))
                 {
                     serializer.Serialize(writer, map);
+                    return true;
                 }
             }
+
+            return false;
         }
 
         public Map DeserializeMap()
