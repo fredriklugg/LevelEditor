@@ -63,6 +63,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Data\Converters.cs" />
     <Compile Include="Data\JsonHandler.cs" />
     <Compile Include="Data\Map.cs" />
     <Compile Include="Data\Tile.cs" />
@@ -107,13 +108,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="resources\overworld_tileset_grass.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Json\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="resources\tilesedited.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="resources\tilesmini.png" />

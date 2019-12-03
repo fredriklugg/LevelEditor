@@ -1,26 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Design;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using Button = System.Windows.Controls.Button;
+using LevelEditor.Data;
 using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using Image = System.Windows.Controls.Image;
-using MouseEventHandler = System.Windows.Input.MouseEventHandler;
-using Rectangle = System.Windows.Shapes.Rectangle;
-using Size = System.Windows.Size;
+
 
 namespace LevelEditor
 {
@@ -40,9 +28,12 @@ namespace LevelEditor
 
         public List<int> TileSetList = new List<int>();
 
+        Converters converter = new Converters();
+
+
         public MainWindow()
         {
-            ImageSource standardTiles = new BitmapImage(new Uri(@"C:\Users\Fredrik\Desktop\Skole\3.År\Semester 1\Tools Prog\Kode\LevelEditor\LevelEditor\resources\tiles-simple.png"));
+            ImageSource standardTiles = new BitmapImage(new Uri(@"C:\LevelEditor\LevelEditor\resources\tiles-simple.png"));
 
             InitializeComponent();
             SetTileSet(standardTiles);
@@ -81,7 +72,7 @@ namespace LevelEditor
                         Source = SelectedTile as BitmapSource
                     };
 
-                    Tile tile = new Tile(row, column, getImageIdFromName(image.Name), indexPos);
+                    Tile tile = new Tile(row, column, converter.getImageIdFromName(image.Name), indexPos);
                     TileList.Add(tile);
 
                     image.AddHandler(Image.MouseLeftButtonDownEvent, new RoutedEventHandler(Draw), true);
@@ -137,7 +128,7 @@ namespace LevelEditor
                     image.Height = cb.Height * 2;
                     image.Width = cb.Width * 2;
 
-                    TileBox.Items.Add(image);
+                    TileBox.Items.Add(cb);
                     TileBox.Items.Refresh();
                 }
             }
@@ -146,7 +137,7 @@ namespace LevelEditor
         private void Draw(object sender, RoutedEventArgs e)
         {
             Image image = sender as Image;
-            string gridIndex = getGridIndexFromName(image.Name);
+            string gridIndex = converter.getGridIndexFromName(image.Name);
             Console.WriteLine(gridIndex);
             image.Name = "";
 
@@ -154,10 +145,10 @@ namespace LevelEditor
             {
                 image.Source = (BitmapSource) SelectedTile;
                 image.Name = "Cell" + SelectedTileIndex + "x" + gridIndex;
-                if (gridIndex == getGridIndexFromName(image.Name))
+                if (gridIndex == converter.getGridIndexFromName(image.Name))
                 {
-                    TileList[Convert.ToInt32(gridIndex)].TileImage = getImageIdFromName(image.Name);
-                    checkNeighbourTiles(Convert.ToInt32(getGridIndexFromName(image.Name)));
+                    TileList[Convert.ToInt32(gridIndex)].TileImage = converter.getImageIdFromName(image.Name);
+                    checkNeighbourTiles(Convert.ToInt32(converter.getGridIndexFromName(image.Name)));
                 }
             }
             Console.WriteLine("Button Clicked " + image.Name);
@@ -213,38 +204,6 @@ namespace LevelEditor
             LoadGrid(map);
         }
 
-        private string getImageIdFromName(string name)
-        {
-            string sub = name.Substring(4, 1);
-            if (name.Length > 7)
-            {
-                if (sub.Contains("x"))
-                {
-                    return sub = name.Substring(4, 2);
-                }
-            }
-
-            return sub;
-        }
-
-        private string getGridIndexFromName(string name)
-        {
-            if (name.Length == 7)
-            {
-                return name.Substring(6, 1);
-            }
-            else if (name.Length == 8)
-            {
-                return name.Substring(6,2);
-            }
-            else if (name.Length == 9)
-            {
-                return name.Substring(7, 2);
-            }
-
-            return name;
-        }
-
         private void checkNeighbourTiles(int tileIndex)
         {
             //Neighbours: L = Left, R = Right, T= Top, B = bottom 
@@ -254,22 +213,99 @@ namespace LevelEditor
             int TL = T - 1;
             int TR = T + 1;
             int B = tileIndex + 10;
-            int BL_ = B - 1;
+            int BL = B - 1;
             int BR = B + 1;
 
-            if (TileList[R].TileImage == "8")
+            int MaxGridSize = GridColumns * GridRows;
+
+            //Select element 0 in the ListView to use automatic road creator
+            if (TL < 0 || TR < 0 || T < 0 || B > MaxGridSize || BL > MaxGridSize || BR > MaxGridSize)
             {
-                TileList[R].TileImage = "1";
-                Map updateMap = new Map(GridRows, GridColumns, TileList, TileSet);
-                LoadGrid(updateMap);
+                return;
+            }
+            if (TileList[tileIndex].TileImage == "0")
+            {
+                if (TileList[T].TileImage == "0" || TileList[T].TileImage == "2" || TileList[T].TileImage == "3" || TileList[T].TileImage == "5" || TileList[T].TileImage == "6" || TileList[T].TileImage == "8" && TileList[B].TileImage == "0" || TileList[B].TileImage == "2" || TileList[B].TileImage == "3" || TileList[B].TileImage == "5" || TileList[B].TileImage == "6" || TileList[B].TileImage == "8")
+                {
+                    TileList[T].TileImage = "1";
+                    TileList[B].TileImage = "1";
+                    TileList[tileIndex].TileImage = "1";
+                    Map updateMap = new Map(GridRows, GridColumns, TileList, TileSet);
+                    LoadGrid(updateMap);
+                    return;
+                }
+                if(TileList[T].TileImage == "0" || TileList[T].TileImage == "2" || TileList[T].TileImage == "3" || TileList[T].TileImage == "5" || TileList[T].TileImage == "6" || TileList[T].TileImage == "8")
+                {
+                    TileList[T].TileImage = "1";
+                    TileList[tileIndex].TileImage = "1";
+                    Map updateMap = new Map(GridRows, GridColumns, TileList, TileSet);
+                    LoadGrid(updateMap);
+                    return;
+                }
+                if (TileList[B].TileImage == "0" || TileList[B].TileImage == "2" || TileList[B].TileImage == "3" || TileList[B].TileImage == "5" || TileList[B].TileImage == "6" || TileList[B].TileImage == "8")
+                {
+                    TileList[B].TileImage = "1";
+                    Map updateMap = new Map(GridRows, GridColumns, TileList, TileSet);
+                    LoadGrid(updateMap);
+                    return;
+                }
+                if (TileList[TR].TileImage == "0" || TileList[TR].TileImage == "1" || TileList[TR].TileImage == "7")
+                {
+                    TileList[R].TileImage = "8";
+                    Map updateMap = new Map(GridRows, GridColumns, TileList, TileSet);
+                    LoadGrid(updateMap);
+                    return;
+                }
+                if (TileList[BR].TileImage == "0" || TileList[BR].TileImage == "1" || TileList[BR].TileImage == "7")
+                {
+                    TileList[B].TileImage = "2";
+                    TileList[BR].TileImage = "6";
+                    Map updateMap = new Map(GridRows, GridColumns, TileList, TileSet);
+                    LoadGrid(updateMap);
+                    return;
+                }
+                if (TileList[BL].TileImage == "0" || TileList[BL].TileImage == "1" || TileList[BL].TileImage == "7")
+                {
+                    TileList[B].TileImage = "8";
+                    Map updateMap = new Map(GridRows, GridColumns, TileList, TileSet);
+                    LoadGrid(updateMap);
+                    return;
+                }
+                if (TileList[TL].TileImage == "0" || TileList[TL].TileImage == "1" || TileList[TL].TileImage == "7")
+                {
+                    TileList[L].TileImage = "2";
+                    TileList[tileIndex].TileImage = "6";
+
+                    Map updateMap = new Map(GridRows, GridColumns, TileList, TileSet);
+                    LoadGrid(updateMap);
+                    return;
+                }
+                if (TileList[L].TileImage == "0" || TileList[L].TileImage == "1" || TileList[L].TileImage == "2" || TileList[L].TileImage == "6" || TileList[L].TileImage == "7" || TileList[L].TileImage == "8" && TileList[R].TileImage == "0" || TileList[R].TileImage == "1" || TileList[R].TileImage == "2" || TileList[R].TileImage == "6" || TileList[R].TileImage == "7" || TileList[R].TileImage == "8")
+                {
+                    TileList[L].TileImage = "3";
+                    TileList[R].TileImage = "3";
+                    TileList[tileIndex].TileImage = "3";
+                    Map updateMap = new Map(GridRows, GridColumns, TileList, TileSet);
+                    LoadGrid(updateMap);
+                    return;
+                }
+                if (TileList[L].TileImage == "0" || TileList[L].TileImage == "1" || TileList[L].TileImage == "2" || TileList[L].TileImage == "6" || TileList[L].TileImage == "7" || TileList[L].TileImage == "8")
+                {
+                    TileList[L].TileImage = "3";
+                    TileList[tileIndex].TileImage = "3";
+                    Map updateMap = new Map(GridRows, GridColumns, TileList, TileSet);
+                    LoadGrid(updateMap);
+                    return;
+                }
+                if (TileList[R].TileImage == "0" || TileList[R].TileImage == "1" || TileList[R].TileImage == "2" || TileList[R].TileImage == "6" || TileList[R].TileImage == "7" || TileList[R].TileImage == "8")
+                {
+                    TileList[R].TileImage = "3";
+                    TileList[tileIndex].TileImage = "3";
+                    Map updateMap = new Map(GridRows, GridColumns, TileList, TileSet);
+                    LoadGrid(updateMap);
+                    return;
+                }
             }
         }
-    }
-
-    public class ListViewData
-    {
-        public Image image { get; set; }
-        public ImageSource imageSource { get; set; }
-
     }
 }
